@@ -6,12 +6,6 @@ export const SecondTitle = styled('h3')(() => ({
     textAlign: 'center',
 }));
 
-export const NotificationText = styled('h4')(() => ({
-    color: '#424D55',
-    textAlign: 'center',
-    opacity: '0.6',
-}));
-
 export const ContactItem = styled('li')(() => ({
     display: 'flex',
     justifyContent: 'space-between',

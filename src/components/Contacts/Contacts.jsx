@@ -1,4 +1,3 @@
-import { Notification } from './Notification';
 import {
     ContactItem,
     ContactText,
@@ -9,51 +8,68 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     selectContacts,
     selectError,
+    selectFilteredContacts,
     selectLoading,
 } from 'redux/contacts/selectors';
+import { deleteContact } from 'redux/contacts/thunks';
+import Loader from 'components/Loader/Loader';
+import Notification from 'components/Notification/Notification';
+import { ErrorNotification } from 'components/Notification/ErrorNotification';
 import { selectFilter } from 'redux/filter/selectors';
-import { deleteContact } from 'redux/contacts/slice';
+import { NotFoundNotification } from 'components/Notification/NotFoundNotification';
 
 export const Contacts = () => {
     const dispatch = useDispatch();
 
     const contacts = useSelector(selectContacts);
+    const visibleContacts = useSelector(selectFilteredContacts);
     const error = useSelector(selectError);
     const isLoading = useSelector(selectLoading);
     const filter = useSelector(selectFilter);
 
-    const getFilteredContacts = () => {
-        return contacts.filter(({ contactName }) =>
-            contactName.toLowerCase().includes(filter.toLowerCase())
-        );
-    };
-
     return (
         <div>
             <SecondTitle>Contacts</SecondTitle>
-            {getFilteredContacts().length ? (
+
+            {isLoading && <Loader />}
+
+            {!error && !isLoading && visibleContacts.length > 0 && (
                 <ul>
-                    {getFilteredContacts().map(
-                        ({ id, contactName, contactNumber }) => {
-                            return (
-                                <ContactItem key={id}>
-                                    <ContactText>
-                                        🧑 {contactName}: {contactNumber}
-                                    </ContactText>
-                                    <DeleteButton
-                                        onClick={() =>
-                                            dispatch(deleteContact(id))
-                                        }
-                                    >
-                                        ❌ Delete
-                                    </DeleteButton>
-                                </ContactItem>
-                            );
-                        }
-                    )}
+                    {visibleContacts.map(({ id, name, phone }) => {
+                        return (
+                            <ContactItem key={id}>
+                                <ContactText>
+                                    🧑 {name}: {phone}
+                                </ContactText>
+                                <DeleteButton
+                                    onClick={() => {
+                                        dispatch(deleteContact(id));
+                                    }}
+                                >
+                                    ❌ Delete
+                                </DeleteButton>
+                            </ContactItem>
+                        );
+                    })}
                 </ul>
-            ) : (
-                <Notification message="Your phone book is empty!" />
+            )}
+
+            {!error && !isLoading && contacts.length === 0 && (
+                <Notification>Your phone book is empty!</Notification>
+            )}
+
+            {error && !isLoading && (
+                <ErrorNotification>
+                    Oops... Something went wrong. Error: {error}. Please, try
+                    again.
+                </ErrorNotification>
+            )}
+
+            {filter && !isLoading && visibleContacts.length === 0 && (
+                <NotFoundNotification>
+                    No contacts matching your search query: "{filter}". Please
+                    change your search parameters and try again.
+                </NotFoundNotification>
             )}
         </div>
     );

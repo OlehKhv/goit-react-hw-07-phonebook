@@ -2,31 +2,29 @@ import { useState } from 'react';
 import { ButtonAdd, InputForm, LabelInput, PhonebookForm } from './Form.styled';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectContacts } from 'redux/contacts/selectors';
-import { addContact } from 'redux/contacts/slice';
+import { addContact } from 'redux/contacts/thunks';
 
 const INITIAL_STATE = {
     name: '',
-    number: '',
+    phone: '',
 };
 
 export const Form = () => {
-    const [contactName, setName] = useState(INITIAL_STATE.name);
-    const [contactNumber, setNumber] = useState(INITIAL_STATE.number);
+    const [name, setName] = useState(INITIAL_STATE.name);
+    const [phone, setPhone] = useState(INITIAL_STATE.phone);
 
     const dispatch = useDispatch();
 
     const contacts = useSelector(selectContacts);
 
-    const handleInput = e => {
-        const { name, value } = e.target;
-
+    const handleInput = ({ target: { name, value } }) => {
         switch (name) {
             case 'name':
                 setName(value);
                 break;
 
-            case 'number':
-                setNumber(value);
+            case 'phone':
+                setPhone(value);
                 break;
             // no default
         }
@@ -35,19 +33,20 @@ export const Form = () => {
     const handleAddContact = e => {
         e.preventDefault();
 
-        if (contacts.some(({ contactName: name }) => name === contactName)) {
-            alert(`${contactName} is already in contacts!`);
+        if (contacts.some(contact => contact.name === name)) {
+            alert(`${name} is already in contacts!`);
+            resetForm();
             return;
         }
 
-        dispatch(addContact({ contactName, contactNumber }));
+        dispatch(addContact({ name, phone }));
 
         resetForm();
     };
 
     const resetForm = () => {
         setName(INITIAL_STATE.name);
-        setNumber(INITIAL_STATE.number);
+        setPhone(INITIAL_STATE.phone);
     };
 
     return (
@@ -59,22 +58,22 @@ export const Form = () => {
                 pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
                 title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
                 required
-                value={contactName}
+                value={name}
                 onChange={handleInput}
                 id="name"
                 placeholder="🙍‍♂️   Alex Smith"
             />
 
-            <LabelInput htmlFor="number">Number</LabelInput>
+            <LabelInput htmlFor="phone">Number</LabelInput>
             <InputForm
                 type="tel"
-                name="number"
+                name="phone"
                 pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
                 title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
                 required
-                value={contactNumber}
+                value={phone}
                 onChange={handleInput}
-                id="number"
+                id="phone"
                 placeholder="📞   222-22-22"
             />
 

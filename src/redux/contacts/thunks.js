@@ -1,16 +1,39 @@
-const { createAsyncThunk } = require('@reduxjs/toolkit');
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import {
+    getAllContacts,
+    newContact,
+    removeContact,
+} from 'services/contactsApi';
 
-const fetchAllContacts = createAsyncThunk('contacts/fetchAll', async () => {
-    const response = await getAllContacts();
-    return response.data;
-});
+export const fetchAllContacts = createAsyncThunk(
+    'contacts/fetchAll',
+    async (_, { rejectWithValue }) => {
+        try {
+            return await getAllContacts();
+        } catch (e) {
+            return rejectWithValue(e.message);
+        }
+    }
+);
 
-const addContact = createAsyncThunk('contacts/addContact', async contact => {
-    const response = await addContact(contact);
-    return response.data;
-});
+export const deleteContact = createAsyncThunk(
+    'contacts/deleteContact',
+    async (id, { rejectWithValue }) => {
+        try {
+            return await removeContact(id);
+        } catch (e) {
+            return rejectWithValue(e.message);
+        }
+    }
+);
 
-const deleteContact = createAsyncThunk('contacts/deleteContact', async id => {
-    const response = await deleteContact(id);
-    return response.data;
-});
+export const addContact = createAsyncThunk(
+    'contacts/addContact',
+    async (contact, { rejectWithValue }) => {
+        try {
+            return await newContact(contact);
+        } catch (e) {
+            return rejectWithValue(e.message);
+        }
+    }
+);
