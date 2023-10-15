@@ -6,7 +6,11 @@ import {
     SecondTitle,
 } from './Contacts.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts } from 'redux/contacts/selectors';
+import {
+    selectContacts,
+    selectError,
+    selectLoading,
+} from 'redux/contacts/selectors';
 import { selectFilter } from 'redux/filter/selectors';
 import { deleteContact } from 'redux/contacts/slice';
 
@@ -14,6 +18,8 @@ export const Contacts = () => {
     const dispatch = useDispatch();
 
     const contacts = useSelector(selectContacts);
+    const error = useSelector(selectError);
+    const isLoading = useSelector(selectLoading);
     const filter = useSelector(selectFilter);
 
     const getFilteredContacts = () => {
